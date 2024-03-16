@@ -76,15 +76,19 @@ public class PersonController {
 
     @PostMapping("update")
     public String UpdatePerson(@ModelAttribute Person person, @RequestParam("image") MultipartFile imageFile) throws IOException {
-        // Update Person
-        Person updatedPerson = personService.update(person);
+
 
         // If Image Is Not Empty
         if (!imageFile.isEmpty()) {
             // Update Person Image
-            personUtil.deleteImage(updatedPerson);
-            personUtil.saveImage(updatedPerson, imageFile);
+            personUtil.deleteImage(person);
+            personUtil.saveImage(person, imageFile);
         }
+
+        // Update Person
+        person.setImg_url(imageFile.getOriginalFilename());
+        Person updatedPerson = personService.update(person);
+
 
         // Redirect to Person List View
         return "redirect:/person";
