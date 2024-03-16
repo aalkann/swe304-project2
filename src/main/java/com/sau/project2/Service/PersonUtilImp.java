@@ -11,25 +11,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
-public class PersonUtilImp implements PersonUtil{
+public class PersonUtilImp implements PersonUtil {
     public static String UPLOAD_DIRECTORY = "src/main/resources/static/images";
+
     @Override
     public void saveImage(Person person, MultipartFile file) throws IOException {
-        String fileName = person.getId().toString() + "." + this.extractImageFileType(file) ;
+        //String fileName = person.getId().toString() + "." + this.extractImageFileType(file) ;
+        String fileName = file.getOriginalFilename();
         Path path = Paths.get(UPLOAD_DIRECTORY, fileName);
         Files.write(path, file.getBytes());
     }
 
     @Override
     public String getImageUrl(Person person) {
-        Path imagePath = Paths.get("/images" , person.getId().toString());
-        return imagePath + "." + person.getImageType();
+        String img_url = person.getImg_url();
+        int last_index = img_url.lastIndexOf("/");
+        String x = "\\"+"images"+"\\";
+        return  x + img_url.substring(last_index+1);
     }
 
     @Override
     public void deleteImage(Person person) throws IOException {
         File imageFile = new File(this.getPersonImageFileRealPath(person));
-        if(imageFile.exists()){
+        if (imageFile.exists()) {
             imageFile.delete();
         }
     }
@@ -40,15 +44,15 @@ public class PersonUtilImp implements PersonUtil{
         if (fileNameWithType != null) {
             int lastDotIndex = fileNameWithType.lastIndexOf('.');
             if (lastDotIndex > 0) {
-                fileExtension = fileNameWithType.substring(lastDotIndex+1);
+                fileExtension = fileNameWithType.substring(lastDotIndex + 1);
             }
         }
         return fileExtension;
     }
 
     private String getPersonImageFileRealPath(Person person) throws IOException {
-        Path imagePath = Paths.get(UPLOAD_DIRECTORY , person.getId().toString());
-        return imagePath +"."+person.getImageType();
+        Path imagePath = Paths.get(UPLOAD_DIRECTORY, person.getId().toString());
+        return imagePath + "." + person.getImg_url();
     }
 
 }

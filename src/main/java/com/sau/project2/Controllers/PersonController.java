@@ -46,6 +46,7 @@ public class PersonController {
         List<String> imageUrls = new ArrayList<>();
         for (Person person : people) {
             String imagePath = personUtil.getImageUrl(person);
+
             imageUrls.add(imagePath);
         }
 
@@ -59,11 +60,15 @@ public class PersonController {
 
     @PostMapping("add")
     public String AddPerson(@ModelAttribute Person person, @RequestParam("image") MultipartFile imageFile) throws IOException {
-        // Save Person
-        Person personSaved = personService.save(person);
 
         // Store Person Image Locally
         personUtil.saveImage(person, imageFile);
+
+
+        // Save Person
+        person.setImg_url(imageFile.getOriginalFilename());
+        Person personSaved = personService.save(person);
+
 
         // Redirect to Person List View
         return "redirect:/person";

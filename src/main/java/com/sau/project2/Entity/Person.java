@@ -20,5 +20,10 @@ public class Person {
     private Long id;
     private String name;
     private String address;
-    private String imageType;
+    private String img_url;
+
+    public void setImg_url(String img_name) {
+        String UPLOAD_DIRECTORY = "src/main/resources/static/images/";
+        this.img_url = UPLOAD_DIRECTORY + img_name;
+    }
 }
