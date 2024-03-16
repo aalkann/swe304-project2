@@ -55,7 +55,7 @@
                             <div class=" row justify-content-around ">
                                 <button class="btn btn-primary"
                                     onclick="showUpdateForm(event)"
-                                    th:attr="data-id=${person.id}, data-name=${person.name},data-address=${person.address}"
+                                    th:attr="data-id=${person.id}, data-name=${person.name},data-address=${person.address},data-img_url=${person.img_url}"
                                     data-toggle="modal" data-target="#personUpdateModal">
                                     Update</button>
                                 <form th:action="@{/person/delete}" method="post">
@@ -87,7 +87,6 @@
                 <form th:action="@{/person/add}" method="post"  enctype="multipart/form-data">
                     <div class="modal-body">
                         <div id="addForm" style="display: none;">
-                            <input type="hidden" id="add-imageType" class="form-control" name="imageType">
                             <label >Image: <input type="file" id="add-image-input"  name="image" accept="image/*" class="form-control-file"> </label> <br>
                             <label>Name: <input type="text" class="form-control" name="name"></label><br>
                             <label>Address: <input type="text" class="form-control" name="address"></label><br>
@@ -119,12 +118,11 @@
                     <div class="modal-body">
                         <div id="updateForm" style="display: none;">
                             <input type="hidden" id="updateId" name="id">
-                            <input type="hidden" id="update-imageType" class="form-control" name="imageType">
                             <label >Image: <input type="file" id="update-image-input"  name="image" accept="image/*" class="form-control-file"> </label> <br>
                             <label>Name: <input type="text" class="form-control" id="updateName"
                                     name="name"></label><br>
-                            <label>Address: <input type="text" class="form-control" id="updateAddress"
-                                    name="address"></label><br>
+                            <label>Address: <input type="text" class="form-control" id="updateAddress" name="address"></label><br>
+                            <input type="hidden" class="form-control" id="updateImg_url" name="img_url">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -146,33 +144,14 @@
             var id = event.target.getAttribute('data-id');
             var name = event.target.getAttribute('data-name');
             var address = event.target.getAttribute('data-address');
+            var img_url = event.target.getAttribute('data-img_url');
             document.getElementById('updateId').value = id;
             document.getElementById('updateName').value = name;
             document.getElementById('updateAddress').value = address;
+            document.getElementById('updateImg_url').value = img_url;
             document.getElementById('addForm').style.display = 'none';
             document.getElementById('updateForm').style.display = 'block';
         }
-
-        // Input Image Field Change Function
-        document.getElementById("add-image-input").addEventListener("change",function (){
-            // Extract the file tpye and set the value of hidden imageType field on the form
-            const file = this.files[0];
-            var imageType = file.type.split('/')[1];
-            if (imageType == "jpeg"){
-                imageType = "jpg";
-            }
-            document.getElementById("add-imageType").value = imageType;
-        })
-
-        document.getElementById("update-image-input").addEventListener("change",function (){
-            // Extract the file tpye and set the value of hidden imageType field on the form
-            const file = this.files[0];
-            var imageType = file.type.split('/')[1];
-            if (imageType == "jpeg"){
-                imageType = "jpg";
-            }
-            document.getElementById("update-imageType").value = imageType;
-        })
 
     </script>
 
