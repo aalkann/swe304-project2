@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Bootstrap JS and dependencies (Popper.js and jQuery) -->
+    <script src="/js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        img{
+            width: 150px;
+        }
+    </style>
+
+    <title>Person Table</title>
+</head>
+
+<body>
+
+    <div class="row justify-content-center  mt-5">
+        <div class="row justify-content-start w-50">
+            <button onclick="showAddForm()" class="btn btn-success" data-toggle="modal"
+                data-target="#personCreateModal">
+                Register Person
+            </button>
+        </div>
+    </div>
+    <section id="PersonTableSection">
+        <div class="row justify-content-center">
+            <table class="table table-bordered table-striped  table-hover w-50">
+                <thead>
+                    <tr>
+                        <th class="col-sm-3"> Image </th>
+                        <th class="col-sm-1"> Id </th>
+                        <th class="col-sm-2"> Name </th>
+                        <th class="col-sm-3"> Address </th>
+                        <th class="col-sm-3"> Actions </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${people.empty}">
+                        <td colspan="12"> No person row exists </td>
+                    </tr>
+                    <tr th:each="person,iStat : ${people} ">
+                        <td> <img th:src="${imageUrls[iStat.index]}" alt="Person Image" /></td>
+                        <td><span th:text="${person.id}"> Name </span></td>
+                        <td><span th:text="${person.name}"> Name </span></td>
+                        <td><span th:text="${person.address}"> Address </span></td>
+                        <td>
+                            <div class=" row justify-content-around ">
+                                <button class="btn btn-primary"
+                                    onclick="showUpdateForm(event)"
+                                    th:attr="data-id=${person.id}, data-name=${person.name},data-address=${person.address}"
+                                    data-toggle="modal" data-target="#personUpdateModal">
+                                    Update</button>
+                                <form th:action="@{/person/delete}" method="post">
+                                    <input type="hidden" name="id" th:value="${person.id}">
+                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+
+    <!-- Modal Create -->
+    <div class="modal fade" id="personCreateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Add Person</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form th:action="@{/person/add}" method="post"  enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div id="addForm" style="display: none;">
+                            <input type="hidden" id="add-imageType" class="form-control" name="imageType">
+                            <label >Image: <input type="file" id="add-image-input"  name="image" accept="image/*" class="form-control-file"> </label> <br>
+                            <label>Name: <input type="text" class="form-control" name="name"></label><br>
+                            <label>Address: <input type="text" class="form-control" name="address"></label><br>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal Update-->
+    <div class="modal fade" id="personUpdateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Update Person</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form th:action="@{/person/update}" method="post"  enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div id="updateForm" style="display: none;">
+                            <input type="hidden" id="updateId" name="id">
+                            <input type="hidden" id="update-imageType" class="form-control" name="imageType">
+                            <label >Image: <input type="file" id="update-image-input"  name="image" accept="image/*" class="form-control-file"> </label> <br>
+                            <label>Name: <input type="text" class="form-control" id="updateName"
+                                    name="name"></label><br>
+                            <label>Address: <input type="text" class="form-control" id="updateAddress"
+                                    name="address"></label><br>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAddForm() {
+            document.getElementById('addForm').style.display = 'block';
+            document.getElementById('updateForm').style.display = 'none';
+        }
+
+        function showUpdateForm(event) {
+            var id = event.target.getAttribute('data-id');
+            var name = event.target.getAttribute('data-name');
+            var address = event.target.getAttribute('data-address');
+            document.getElementById('updateId').value = id;
+            document.getElementById('updateName').value = name;
+            document.getElementById('updateAddress').value = address;
+            document.getElementById('addForm').style.display = 'none';
+            document.getElementById('updateForm').style.display = 'block';
+        }
+
+        // Input Image Field Change Function
+        document.getElementById("add-image-input").addEventListener("change",function (){
+            // Extract the file tpye and set the value of hidden imageType field on the form
+            const file = this.files[0];
+            var imageType = file.type.split('/')[1];
+            if (imageType == "jpeg"){
+                imageType = "jpg";
+            }
+            document.getElementById("add-imageType").value = imageType;
+        })
+
+        document.getElementById("update-image-input").addEventListener("change",function (){
+            // Extract the file tpye and set the value of hidden imageType field on the form
+            const file = this.files[0];
+            var imageType = file.type.split('/')[1];
+            if (imageType == "jpeg"){
+                imageType = "jpg";
+            }
+            document.getElementById("update-imageType").value = imageType;
+        })
+
+    </script>
+
+
+
+</body>
+
+    <style>
+        .modal-dialog {
+            max-width: 600px;
+        }
+    </style>
+
+
+</html>
