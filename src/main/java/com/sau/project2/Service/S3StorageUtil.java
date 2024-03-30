@@ -53,7 +53,7 @@ public class S3StorageUtil implements ImageStorageStrategy {
 
         S3ObjectInputStream objectContent = image.getObjectContent();
         try {
-            IOUtils.copy(objectContent, new FileOutputStream("/home/images/" + image.getKey()));
+            IOUtils.copy(objectContent, new FileOutputStream("src/main/resources/static/images" + image.getKey()));
             return getImageLocalPath(person);
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -68,7 +68,7 @@ public class S3StorageUtil implements ImageStorageStrategy {
     public void deleteImage(Person person) {
         try {
             s3Client.deleteObject(bucketName, getImageName(person.getImg_url()));
-            File imageFile = new File("/home/images/" + getImageName(person.getImg_url()));
+            File imageFile = new File("src/main/resources/static/images" + getImageName(person.getImg_url()));
             if(imageFile.exists())
             {
                 imageFile.delete();

@@ -6,22 +6,23 @@ import java.util.List;
 
 import com.sau.project2.ImageUtils.ImageStorageStrategy;
 import com.sau.project2.ImageUtils.ImageStorageStrategyFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.sau.project2.Entity.Person;
 import com.sau.project2.Service.PersonService;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
 @RequestMapping(path = "/person")
-public class PersonController {
+public class PersonController  {
 
 
     private final PersonService personService;
@@ -53,6 +54,7 @@ public class PersonController {
         // Return Person List View
         return "Person/index.html";
     }
+
 
     @PostMapping("add")
     public String AddPerson(@ModelAttribute Person person, @RequestParam("image") MultipartFile imageFile) throws IOException {
@@ -101,6 +103,8 @@ public class PersonController {
         // Redirect to Person List View
         return "redirect:/person";
     }
+
+
 
 
 }

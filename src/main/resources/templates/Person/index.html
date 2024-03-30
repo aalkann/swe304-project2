@@ -22,14 +22,19 @@
 
 <body>
 
+
     <div class="row justify-content-center  mt-5">
         <div class="row justify-content-start w-50">
             <button onclick="showAddForm()" class="btn btn-success" data-toggle="modal"
                 data-target="#personCreateModal">
                 Register Person
             </button>
+            <div class="alert-danger" th:if="${errorMessage != null}">
+                <i colspan="12" th:text="${errorMessage}"></i>
+            </div>
         </div>
     </div>
+
     <section id="PersonTableSection">
         <div class="row justify-content-center">
             <table class="table table-bordered table-striped  table-hover w-50">

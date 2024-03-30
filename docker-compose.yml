@@ -1,3 +1,4 @@
+version: "3.7"
 services:
   postgres:
     build: ./docker/db
@@ -23,6 +24,8 @@ services:
       - "8082:8081"
     depends_on:
       - postgres
+    volumes:
+      - images:/src/main/resources/static/images
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/swe304
       SPRING_DATASOURCE_USERNAME: postgres
@@ -31,6 +34,7 @@ services:
 
 volumes:
   pgdata:
+  images:
 
 networks:
   web:
