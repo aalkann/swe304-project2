@@ -1,20 +1,13 @@
 package com.sau.project2.Controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import com.sau.project2.Service.PersonUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import com.sau.project2.ImageUtils.ImageStorageStrategy;
+import com.sau.project2.ImageUtils.ImageStorageStrategyFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,11 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class PersonController {
 
 
-    @Autowired
-    private PersonService personService;
+    private final PersonService personService;
+    private final ImageStorageStrategy imageUtil;
 
-    @Autowired
-    private PersonUtil personUtil;
+
+    public PersonController(ImageStorageStrategyFactory imageUtilFactory, PersonService personService) {
+        this.imageUtil = imageUtilFactory.getImageStorageStrategy();
+        this.personService = personService;
+    }
 
     @GetMapping("")
     public String ListPeople(Model model) throws IOException {
@@ -45,7 +41,7 @@ public class PersonController {
         // Get People Images
         List<String> imageUrls = new ArrayList<>();
         for (Person person : people) {
-            String imagePath = personUtil.getImageUrl(person);
+            String imagePath = imageUtil.getImageFromURL(person);
 
             imageUrls.add(imagePath);
         }
@@ -61,12 +57,11 @@ public class PersonController {
     @PostMapping("add")
     public String AddPerson(@ModelAttribute Person person, @RequestParam("image") MultipartFile imageFile) throws IOException {
 
-        // Store Person Image Locally
-        personUtil.saveImage(person, imageFile);
-
+        // Store Image
+        String img_url = imageUtil.saveImage(imageFile);
 
         // Save Person
-        person.setImg_url(imageFile.getOriginalFilename());
+        person.setImg_url(img_url);
         Person personSaved = personService.save(person);
 
 
@@ -80,14 +75,14 @@ public class PersonController {
 
         // If Image Is Not Empty
         if (!imageFile.isEmpty()) {
-            // Update Person Image
-            personUtil.deleteImage(person);
-            personUtil.saveImage(person, imageFile);
+            // Delete Old Image
+            imageUtil.deleteImage(person);
         }
 
         // Update Person
-        person.setImg_url(imageFile.getOriginalFilename());
-        Person updatedPerson = personService.update(person);
+        String img_url = imageUtil.saveImage(imageFile);
+        person.setImg_url(img_url);
+        personService.update(person);
 
 
         // Redirect to Person List View
@@ -101,7 +96,7 @@ public class PersonController {
         personService.delete(id);
 
         // Delete Person Image
-        personUtil.deleteImage(person);
+        imageUtil.deleteImage(person);
 
         // Redirect to Person List View
         return "redirect:/person";
