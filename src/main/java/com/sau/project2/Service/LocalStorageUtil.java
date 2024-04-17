@@ -51,8 +51,8 @@ public class LocalStorageUtil implements ImageStorageStrategy {
 
 
     private String getPersonImageFileRealPath(Person person) throws IOException {
-        Path imagePath = Paths.get(UPLOAD_DIRECTORY, person.getId().toString());
-        return imagePath + "." + person.getImg_url();
+        Path imagePath = Paths.get(person.getImg_url());
+        return imagePath.toString();
     }
 
     @Override
