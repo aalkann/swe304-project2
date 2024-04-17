@@ -79,11 +79,17 @@ public class PersonController  {
         if (!imageFile.isEmpty()) {
             // Delete Old Image
             imageUtil.deleteImage(person);
-        }
 
-        // Update Person
-        String img_url = imageUtil.saveImage(imageFile);
-        person.setImg_url(img_url);
+            // Update Person Image
+            String img_url = imageUtil.saveImage(imageFile);
+            person.setImg_url(img_url);
+        }
+        // Keep the same image but update the other fields
+        else
+        {
+            String old_img_url = personService.getById(person.getId()).getImg_url();
+            person.setImg_url(old_img_url);
+        }
         personService.update(person);
 
 
