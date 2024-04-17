@@ -29,10 +29,16 @@ public class LocalStorageUtil implements ImageStorageStrategy {
 
     @Override
     public String getImageFromURL(Person person) {
-        String img_url = person.getImg_url();
-        int last_index = img_url.lastIndexOf("\\");
+        String url = person.getImg_url();
+        if(url.contains(("\\")))
+        {
+            url = url.replace("\\", "/");
+
+        }
+
+        int last_index = url.lastIndexOf("/");
         String prefix = "\\" + "images" + "\\";
-        return prefix + img_url.substring(last_index + 1);
+        return prefix + url.substring(last_index + 1);
     }
 
     @Override
