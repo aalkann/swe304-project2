@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 @Service
@@ -53,7 +57,16 @@ public class S3StorageUtil implements ImageStorageStrategy {
 
         S3ObjectInputStream objectContent = image.getObjectContent();
         try {
-            IOUtils.copy(objectContent, new FileOutputStream("src/main/resources/static/images" + image.getKey()));
+
+
+            String imageName = getImageName(person.getImg_url());
+
+
+            Path imagePath = Paths.get("src/main/resources/static/images", imageName);
+            Files.createDirectories(imagePath.getParent());
+            Files.copy(objectContent, imagePath, StandardCopyOption.REPLACE_EXISTING);
+
+
             return getImageLocalPath(person);
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -64,13 +77,19 @@ public class S3StorageUtil implements ImageStorageStrategy {
         return null;
     }
 
+    public String getImageLocalPath(Person person) {
+        String url = person.getImg_url();
+        int last_index = url.lastIndexOf("/");
+        return "/images" + File.separator + url.substring(last_index + 1);
+    }
+
+
     @Override
     public void deleteImage(Person person) {
         try {
             s3Client.deleteObject(bucketName, getImageName(person.getImg_url()));
-            File imageFile = new File("src/main/resources/static/images" + getImageName(person.getImg_url()));
-            if(imageFile.exists())
-            {
+            File imageFile = new File("src/main/resources/static/images/" + getImageName(person.getImg_url()));
+            if (imageFile.exists()) {
                 imageFile.delete();
             }
         } catch (AmazonS3Exception s3Exception) {
@@ -79,15 +98,9 @@ public class S3StorageUtil implements ImageStorageStrategy {
     }
 
 
-    public String getImageLocalPath(Person person) {
-        String img_url = person.getImg_url();
-        int last_index = img_url.lastIndexOf("/");
-        String prefix = "\\" + "images" + "\\";
-        return prefix + img_url.substring(last_index + 1);
-    }
-
     @Override
     public String getImageName(String img_url) {
         return img_url.substring(img_url.lastIndexOf("/") + 1);
     }
 }
+

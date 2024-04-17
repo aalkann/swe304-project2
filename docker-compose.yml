@@ -25,7 +25,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - images:/src/main/resources/static/images
+      - ./src/main/resources/static/images:/images
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/swe304
       SPRING_DATASOURCE_USERNAME: postgres
