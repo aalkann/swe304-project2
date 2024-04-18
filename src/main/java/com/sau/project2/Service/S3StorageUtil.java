@@ -88,7 +88,7 @@ public class S3StorageUtil implements ImageStorageStrategy {
     public void deleteImage(Person person) {
         try {
             s3Client.deleteObject(bucketName, getImageName(person.getImg_url()));
-            File imageFile = new File("src/main/resources/static/images/" + getImageName(person.getImg_url()));
+            File imageFile = new File("src/main/resources/static/images" + getImageName(person.getImg_url()));
             if (imageFile.exists()) {
                 imageFile.delete();
             }
