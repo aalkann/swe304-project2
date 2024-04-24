@@ -1,9 +1,6 @@
 package com.sau.project2.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,8 @@ public class Person {
     private Long id;
     private String name;
     private String address;
+
+    @Column(length = 500)
     private String img_url;
 
 }

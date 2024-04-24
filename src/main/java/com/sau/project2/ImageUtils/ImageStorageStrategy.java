@@ -10,7 +10,7 @@ public interface ImageStorageStrategy {
     String saveImage(MultipartFile file) throws IOException;
 
 
-    String getImageFromURL(Person person);
+    String getImagePathFromUrl(String url); // Local takes path, Ec2 takes image name (key)
 
     void deleteImage(Person person) throws IOException;
 

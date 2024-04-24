@@ -3,7 +3,6 @@ package com.sau.project2.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.amazonaws.util.IOUtils;
 import com.sau.project2.Entity.Person;
 import com.sau.project2.ImageUtils.ImageStorageStrategy;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Optional;
 
 @Service
 public class S3StorageUtil implements ImageStorageStrategy {
@@ -32,10 +26,10 @@ public class S3StorageUtil implements ImageStorageStrategy {
     @Override
     public String saveImage(MultipartFile file) throws IOException {
         try {
+            //Upload to cloud
             String key = file.getOriginalFilename();
             PutObjectResult result = s3Client.putObject(bucketName, key, file.getInputStream(), null);
-            return s3Client.getUrl(bucketName, key).toString();
-
+            return key;
         } catch (IOException ioException) {
             System.out.println(ioException.getMessage());
             throw ioException;
@@ -47,51 +41,26 @@ public class S3StorageUtil implements ImageStorageStrategy {
     }
 
 
-    public Optional<S3Object> getImage(Person person) {
-        return Optional.ofNullable(s3Client.getObject(bucketName, person.getImg_url()));
+    public S3Object getImageFromS3(String key) {
+        return s3Client.getObject(bucketName, key);
     }
 
     @Override
-    public String getImageFromURL(Person person) {
-        S3Object image = s3Client.getObject(bucketName, getImageName(person.getImg_url()));
+    public String getImagePathFromUrl(String url) {
 
-        S3ObjectInputStream objectContent = image.getObjectContent();
-        try {
-
-
-            String imageName = getImageName(person.getImg_url());
-
-
-            Path imagePath = Paths.get("src/main/resources/static/images", imageName);
-            Files.createDirectories(imagePath.getParent());
-            Files.copy(objectContent, imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-
-            return getImageLocalPath(person);
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return null;
-    }
-
-    public String getImageLocalPath(Person person) {
-        String url = person.getImg_url();
-        int last_index = url.lastIndexOf("/");
-        return "/images" + File.separator + url.substring(last_index + 1);
+        return generatePresignedUrl(url);
     }
 
 
     @Override
     public void deleteImage(Person person) {
         try {
-            s3Client.deleteObject(bucketName, getImageName(person.getImg_url()));
-            File imageFile = new File("src/main/resources/static/images" + getImageName(person.getImg_url()));
-            if (imageFile.exists()) {
-                imageFile.delete();
-            }
+            String imageName = getImageName(person.getImg_url());
+
+            //Delete from cloud
+            s3Client.deleteObject(bucketName, imageName);
+
+
         } catch (AmazonS3Exception s3Exception) {
             System.out.println(s3Exception.getMessage());
         }
@@ -101,6 +70,15 @@ public class S3StorageUtil implements ImageStorageStrategy {
     @Override
     public String getImageName(String img_url) {
         return img_url.substring(img_url.lastIndexOf("/") + 1);
+    }
+
+    public String generatePresignedUrl(String key) {
+
+        java.util.Date expiration = new java.util.Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 60;
+        expiration.setTime(expTimeMillis);
+        return s3Client.generatePresignedUrl(bucketName, key, expiration).toString();
     }
 }
 

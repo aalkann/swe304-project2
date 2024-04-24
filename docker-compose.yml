@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    build: ./docker/db
+    image: postgres
     container_name: postgres-db
     environment:
       POSTGRES_DB: swe304
@@ -18,16 +18,16 @@ services:
       retries: 5
 
   web:
-    build: .
+    image: abdulhady/swe304-project2-web
     container_name: web
     ports:
       - "8082:8081"
     depends_on:
       - postgres
     volumes:
-      - ./src/main/resources/static/images:/images
+      - ./src/main/resources/static/images:/src/main/resources/static/images
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/swe304
+      DB_URL: jdbc:postgresql://postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
 

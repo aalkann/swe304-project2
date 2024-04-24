@@ -6,18 +6,13 @@ import java.util.List;
 
 import com.sau.project2.ImageUtils.ImageStorageStrategy;
 import com.sau.project2.ImageUtils.ImageStorageStrategyFactory;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.sau.project2.Entity.Person;
 import com.sau.project2.Service.PersonService;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -40,16 +35,16 @@ public class PersonController  {
         List<Person> people = personService.getAll();
 
         // Get People Images
-        List<String> imageUrls = new ArrayList<>();
+        List<String> imagePaths = new ArrayList<>();
         for (Person person : people) {
-            String imagePath = imageUtil.getImageFromURL(person);
+            String imagePath = imageUtil.getImagePathFromUrl(person.getImg_url());
 
-            imageUrls.add(imagePath);
+            imagePaths.add(imagePath);
         }
 
         // Add Object into The Model
         model.addAttribute("people", people);
-        model.addAttribute("imageUrls", imageUrls);
+        model.addAttribute("imageUrls", imagePaths);
 
         // Return Person List View
         return "Person/index.html";

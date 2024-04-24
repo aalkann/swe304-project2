@@ -28,8 +28,8 @@ public class LocalStorageUtil implements ImageStorageStrategy {
 
 
     @Override
-    public String getImageFromURL(Person person) {
-        String url = person.getImg_url();
+    public String getImagePathFromUrl(String url) {
+
         if(url.contains(("\\")))
         {
             url = url.replace("\\", "/");
